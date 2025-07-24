@@ -13,7 +13,7 @@ on:
         required: false
 
 jobs:
-  authenticate:
+  auth:
     runs-on: ubuntu-latest
 
     outputs:
@@ -23,12 +23,12 @@ jobs:
       - name: Install Salesforce CLI
         run: npm install @salesforce/cli@latest --global
 
-      - name: Write JWT key to file
+      - name: Write JWT Key
         run: |
           echo "${{ secrets.SERVER_KEY }}" > server.key
           chmod 600 server.key
 
-      - name: Authenticate to Salesforce using JWT
+      - name: Authenticate to Salesforce
         run: |
           sf auth:jwt:grant \
             --client-id ${{ secrets.CLIENT_ID }} \
@@ -37,5 +37,5 @@ jobs:
             --alias myqaorg \
             --instance-url ${{ secrets.SF_INSTANCE_URL || 'https://login.salesforce.com' }}
 
-      - name: Confirm authentication
+      - name: Show Org Info
         run: sf org display myqaorg

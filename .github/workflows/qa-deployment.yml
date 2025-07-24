@@ -13,7 +13,7 @@ on:
         required: false
 
 jobs:
-  deploy:
+  deployment:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,15 +22,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Call QA Authentication workflow
+      - name: Authenticate to Salesforce (reusable workflow)
         uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-authentication.yml@qa
+        id: auth
         secrets:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
           SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
 
-      - name: Detect changed metadata files
+      - name: Detect changed metadata
         run: |
           git fetch origin qa
           git diff --name-only origin/qa...HEAD > changed_files.txt
@@ -41,7 +42,7 @@ jobs:
           mkdir -p manifest
           node scripts/generate-package-xml.js filtered_changed_files.txt manifest/package.xml
 
-      - name: Deploy metadata to Salesforce org
+      - name: Deploy metadata
         run: |
           sf project deploy start \
             --manifest manifest/package.xml \
