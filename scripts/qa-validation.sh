@@ -11,6 +11,6 @@ node scripts/generate-package-xml.js filtered_changed_files.txt manifest/package
 sf project deploy start \
   --manifest manifest/package.xml \
   --target-org myqaorg \
-  --checkonly \
+  --check-only \
   --test-level RunLocalTests \
   --wait 40
