@@ -9,30 +9,52 @@ on:
       - qa
 
 jobs:
-  authentication:
-    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-authentication.yml@qa
-    secrets:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      SERVER_KEY: ${{ secrets.SERVER_KEY }}
-      SF_USERNAME: ${{ secrets.SF_USERNAME }}
-      SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+  build_and_deploy:
+    runs-on: ubuntu-latest
 
-  validation:
-    needs: authentication
-    if: github.event_name == 'pull_request' && github.base_ref == 'qa'
-    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-validation.yml@qa
-    secrets:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      SERVER_KEY: ${{ secrets.SERVER_KEY }}
-      SF_USERNAME: ${{ secrets.SF_USERNAME }}
-      SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-  deployment:
-    needs: validation
-    if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
-    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-deployment.yml@qa
-    secrets:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      SERVER_KEY: ${{ secrets.SERVER_KEY }}
-      SF_USERNAME: ${{ secrets.SF_USERNAME }}
-      SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Salesforce CLI
+        run: npm install @salesforce/cli@latest --global
+
+      - name: Write JWT key to file
+        env:
+          SERVER_KEY: ${{ secrets.SERVER_KEY }}
+        run: |
+          echo "$SERVER_KEY" > server.key
+          chmod 600 server.key
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Authenticate to Salesforce
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+        run: ./scripts/authenticate.sh
+
+      - name: Validate deployment (check-only)
+        if: github.event_name == 'pull_request'
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+        run: ./scripts/validate.sh
+
+      - name: Deploy to Salesforce
+        if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SF_USERNAME: ${{ secrets.SF_USERNAME }}
+          SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+        run: ./scripts/deploy.sh
