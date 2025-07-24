@@ -24,7 +24,6 @@ jobs:
 
       - name: Call QA Authentication workflow
         uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-authentication.yml@qa
-        id: auth
         secrets:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           SERVER_KEY: ${{ secrets.SERVER_KEY }}
