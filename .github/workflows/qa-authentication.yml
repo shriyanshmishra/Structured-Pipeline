@@ -1,0 +1,41 @@
+name: QA Authentication
+
+on:
+  workflow_call:
+    secrets:
+      CLIENT_ID:
+        required: true
+      SERVER_KEY:
+        required: true
+      SF_USERNAME:
+        required: true
+      SF_INSTANCE_URL:
+        required: false
+
+jobs:
+  authenticate:
+    runs-on: ubuntu-latest
+
+    outputs:
+      sf-org-alias: myqaorg
+
+    steps:
+      - name: Install Salesforce CLI
+        run: npm install @salesforce/cli@latest --global
+
+      - name: Write JWT key to file
+        run: |
+          echo "${{ secrets.SERVER_KEY }}" > server.key
+          chmod 600 server.key
+
+      - name: Authenticate to Salesforce using JWT
+        run: |
+          sf auth:jwt:grant \
+            --client-id ${{ secrets.CLIENT_ID }} \
+            --jwt-key-file server.key \
+            --username ${{ secrets.SF_USERNAME }} \
+            --alias myqaorg \
+            --instance-url ${{ secrets.SF_INSTANCE_URL || 'https://login.salesforce.com' }}
+
+      - name: Confirm authentication
+        run: sf org display myqaorg
