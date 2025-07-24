@@ -9,4 +9,4 @@ sf auth:jwt:grant \
   --alias myqaorg \
   --instance-url "${SF_INSTANCE_URL:-https://login.salesforce.com}"
 
-sf org display myqaorg
+sf org display --target-org myqaorg
