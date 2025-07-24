@@ -10,7 +10,7 @@ on:
 
 jobs:
   authentication:
-    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/authentication/org/authentication.yml@qa
+    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/authentication.yml@qa
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
@@ -20,7 +20,7 @@ jobs:
   validation:
     needs: authentication
     if: github.event_name == 'pull_request' && github.base_ref == 'qa'
-    uses: ./validation/org/validation.yml
+    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-validation.yml@qa
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
@@ -30,7 +30,7 @@ jobs:
   deployment:
     needs: validation
     if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
-    uses: ./deployment/org/deployment.yml
+    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-deployment.yml@qa
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
