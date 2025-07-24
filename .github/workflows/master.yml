@@ -10,7 +10,7 @@ on:
 
 jobs:
   authentication:
-    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/authentication.yml@qa
+    uses: shriyanshmishra/Structured-Pipeline/.github/workflows/qa-authentication.yml@qa
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SERVER_KEY: ${{ secrets.SERVER_KEY }}
