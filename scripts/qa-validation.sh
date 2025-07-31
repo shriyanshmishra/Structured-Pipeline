@@ -10,7 +10,10 @@ git diff --name-only origin/qa...HEAD > changed_files.txt
 # Filter only Salesforce metadata files inside force-app/main/default/
 grep '^force-app/main/default/' changed_files.txt > filtered_changed_files.txt || true
 
-# Create manifest directory if not exists, then generate package.xml for changed metadata
+# Save this list as the single source of truth for deployment
+# (Artifact upload is handled by GitHub Actions step)
+
+# Create manifest directory and generate package.xml for changed metadata
 mkdir -p manifest
 node scripts/generate-package-xml.js filtered_changed_files.txt manifest/package.xml
 
@@ -24,10 +27,11 @@ if ! grep -q "<types>" manifest/package.xml; then
   exit 0
 fi
 
-# Validate deployment (check-only) using sf CLI
+# Validate deployment (check-only)
 sf project deploy start \
   --manifest manifest/package.xml \
   --target-org myqaorg \
-  -c \
+  --check-only \
   --test-level RunLocalTests \
   --wait 40
+echo "Deployment validation completed successfully."
