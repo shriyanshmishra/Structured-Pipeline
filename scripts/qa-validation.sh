@@ -23,6 +23,6 @@ echo "========================================="
 sf project deploy start \
   --manifest manifest/package.xml \
   --target-org myqaorg \
-  --c\
+  -c \
   --test-level RunLocalTests \
   --wait 40
