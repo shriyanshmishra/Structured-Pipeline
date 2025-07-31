@@ -18,8 +18,13 @@ echo "===== Generated package.xml content ====="
 cat manifest/package.xml
 echo "========================================="
 
+# Check if package.xml has any metadata types to deploy
+if ! grep -q "<types>" manifest/package.xml; then
+  echo "No metadata type changes detected in package.xml. Skipping validation."
+  exit 0
+fi
+
 # Validate deployment (check-only) using sf CLI
-# Use --check-only flag (with dash) for sf CLI compatibility
 sf project deploy start \
   --manifest manifest/package.xml \
   --target-org myqaorg \
