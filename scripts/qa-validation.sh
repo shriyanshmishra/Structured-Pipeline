@@ -31,7 +31,6 @@ fi
 sf project deploy validate \
   --manifest manifest/package.xml \
   --target-org myqaorg \
-  --check-only \
   --test-level RunLocalTests \
   --wait 40
 echo "Deployment validation completed successfully."
