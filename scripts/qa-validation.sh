@@ -28,7 +28,7 @@ if ! grep -q "<types>" manifest/package.xml; then
 fi
 
 # Validate deployment (check-only)
-sf project deploy start \
+sf project deploy validate \
   --manifest manifest/package.xml \
   --target-org myqaorg \
   -c \
