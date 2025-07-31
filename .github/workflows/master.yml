@@ -51,22 +51,6 @@ jobs:
           SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
         run: ./scripts/qa-validation.sh
 
-      # Upload artifact only on pull_request validation runs
-      - name: Upload validated changed file list
-        if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: validated-metadata-list
-          path: filtered_changed_files.txt
-
-      # Download artifact only on push deployment runs
-      - name: Download validated changed file list
-        if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
-        uses: actions/download-artifact@v4
-        with:
-          name: validated-metadata-list
-          path: .
-
       - name: Deploy to Salesforce
         if: github.event_name == 'push' && github.ref == 'refs/heads/qa'
         env:
@@ -74,4 +58,3 @@ jobs:
           SF_USERNAME: ${{ secrets.SF_USERNAME }}
           SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
         run: ./scripts/qa-deployment.sh
-          
